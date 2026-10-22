@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mental Health Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Mental Health Calculator</h1>
+      <p class="intro">
+        A simple self-check using three widely used screening scales.
+        Answer how you have felt <strong>over the last 2 weeks</strong>.
+        This is a screening tool, <strong>not a medical diagnosis</strong>.
+      </p>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-scale="phq9" role="tab">Depression (PHQ-9)</button>
+      <button class="tab" data-scale="gad7" role="tab">Anxiety (GAD-7)</button>
+      <button class="tab" data-scale="pss4" role="tab">Stress (PSS-4)</button>
+    </nav>
+
+    <section id="calculator">
+      <h2 id="scale-title"></h2>
+      <p id="scale-subtitle" class="muted"></p>
+      <form id="questions"></form>
+      <button id="calculate" disabled>Calculate my score</button>
+      <button id="reset" class="secondary" type="button">Start again</button>
+    </section>
+
+    <section id="result" class="hidden" aria-live="polite">
+      <h2>Your result</h2>
+      <p class="score"><span id="score-value">0</span> <span id="score-max" class="muted"></span></p>
+      <div class="bar"><div id="bar-fill"></div></div>
+      <p id="score-band" class="band"></p>
+      <p id="score-meaning"></p>
+      <p id="score-advice"></p>
+      <div id="support-note" class="support hidden">
+        <strong>Please reach out for support now.</strong><br />
+        One of your answers suggests you may have had thoughts of harming yourself.
+        You do not have to face this alone. In India you can call Tele-MANAS on
+        <strong>14416</strong> (free, 24/7) or emergency services on <strong>112</strong>.
+        Outside India, contact your local crisis line or emergency number.
+      </div>
+    </section>
+
+    <footer>
+      <p class="muted small">
+        PHQ-9 and GAD-7 are standard clinical screening questionnaires and PSS-4 is a
+        short perceived-stress scale. Only a qualified health professional who knows
+        your full situation can make a diagnosis. If your score is moderate or above,
+        or symptoms are affecting daily life, please talk to a doctor or mental
+        health professional.
+      </p>
+    </footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
