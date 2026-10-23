@@ -47,6 +47,24 @@
       </div>
     </section>
 
+    <section id="history">
+      <h2>Your saved results</h2>
+      <p class="muted small">
+        Every score you calculate is saved in a small database inside
+        <strong>this browser on this device only</strong> (localStorage).
+        Nothing is sent to any server. <span id="history-count"></span>
+      </p>
+      <p id="history-empty" class="muted">No saved results yet — complete a check above and your score will appear here.</p>
+      <table id="history-table">
+        <thead>
+          <tr><th>Date &amp; time</th><th>Scale</th><th>Score</th><th>Band</th></tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+      </table>
+      <button id="download-csv" class="secondary" type="button">Download CSV (for Excel / Power BI)</button>
+      <button id="clear-history" class="secondary" type="button">Clear all saved results</button>
+    </section>
+
     <footer>
       <p class="muted small">
         PHQ-9 and GAD-7 are standard clinical screening questionnaires and PSS-4 is a

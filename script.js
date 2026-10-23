@@ -114,6 +114,46 @@ function calculateScore(scaleKey, rawValues) {
   return { total, max: scale.max, band, supportFlag };
 }
 
+// ---- Local database (browser localStorage) ------------------------------
+// Every completed check is saved as one record:
+// { date (ISO string), scale, score, max, band }
+// Storage functions take a `storage` object (anything with
+// getItem/setItem) so they can be unit-tested in Node with a stub.
+
+const DB_KEY = "mhc_results_v1";
+
+function loadResults(storage) {
+  try {
+    const raw = storage.getItem(DB_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveResult(storage, record) {
+  const results = loadResults(storage);
+  results.push(record);
+  storage.setItem(DB_KEY, JSON.stringify(results));
+  return results;
+}
+
+function clearResults(storage) {
+  storage.setItem(DB_KEY, JSON.stringify([]));
+  return [];
+}
+
+function buildCSV(results) {
+  const escape = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+  const lines = ["Date,Scale,Score,Max,Band"];
+  results.forEach((r) => {
+    lines.push([r.date, r.scale, r.score, r.max, r.band].map(escape).join(","));
+  });
+  return lines.join("\n");
+}
+
 // ---- Browser UI ----------------------------------------------------------
 
 if (typeof document !== "undefined") {
@@ -188,6 +228,59 @@ if (typeof document !== "undefined") {
     document.getElementById("support-note").classList.toggle("hidden", !supportFlag);
     resultEl.classList.remove("hidden");
     resultEl.scrollIntoView({ behavior: "smooth" });
+
+    // Save this result to the local (browser) database and refresh history.
+    saveResult(window.localStorage, {
+      date: new Date().toISOString(),
+      scale: SCALES[currentScale].title,
+      score: total,
+      max: max,
+      band: band.name,
+    });
+    renderHistory();
+  });
+
+  // ---- History (local database) UI ----
+  const historyBody = document.getElementById("history-body");
+  const historyEmpty = document.getElementById("history-empty");
+  const historyCount = document.getElementById("history-count");
+
+  function renderHistory() {
+    const results = loadResults(window.localStorage);
+    historyCount.textContent = results.length
+      ? results.length + " saved result" + (results.length === 1 ? "" : "s")
+      : "";
+    historyEmpty.classList.toggle("hidden", results.length > 0);
+    historyBody.innerHTML = "";
+    // Newest first.
+    results.slice().reverse().forEach((r) => {
+      const tr = document.createElement("tr");
+      [new Date(r.date).toLocaleString(), r.scale, r.score + " / " + r.max, r.band].forEach((cell) => {
+        const td = document.createElement("td");
+        td.textContent = cell;
+        tr.appendChild(td);
+      });
+      historyBody.appendChild(tr);
+    });
+  }
+
+  document.getElementById("download-csv").addEventListener("click", () => {
+    const results = loadResults(window.localStorage);
+    if (!results.length) return;
+    const blob = new Blob([buildCSV(results)], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "mental-health-results.csv";
+    link.click();
+    URL.revokeObjectURL(link.href);
+  });
+
+  document.getElementById("clear-history").addEventListener("click", () => {
+    if (!loadResults(window.localStorage).length) return;
+    if (window.confirm("Delete all saved results from this browser?")) {
+      clearResults(window.localStorage);
+      renderHistory();
+    }
   });
 
   resetBtn.addEventListener("click", render);
@@ -202,9 +295,10 @@ if (typeof document !== "undefined") {
   });
 
   render();
+  renderHistory();
 }
 
 // Export for Node tests (ignored by the browser).
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { SCALES, calculateScore };
+  module.exports = { SCALES, calculateScore, DB_KEY, loadResults, saveResult, clearResults, buildCSV };
 }

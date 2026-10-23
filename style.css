@@ -30,13 +30,17 @@ h1 { margin-bottom: 8px; }
 }
 .tab.active { background: #2563eb; border-color: #2563eb; color: #fff; }
 
-#calculator, #result {
+#calculator, #result, #history {
   background: #fff;
   border: 1px solid #dde4ea;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;
 }
+
+#history-table { width: 100%; border-collapse: collapse; margin: 12px 0 16px; font-size: 0.92rem; }
+#history-table th, #history-table td { border: 1px solid #dde4ea; padding: 8px 10px; text-align: left; }
+#history-table th { background: #f4f6f8; }
 
 .question { margin-bottom: 18px; }
 .question p { margin: 0 0 8px; font-weight: 600; }
